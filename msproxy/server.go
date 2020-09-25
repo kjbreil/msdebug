@@ -49,9 +49,15 @@ func server() error {
 				Data:     string(buf[:n]),
 				Callback: *callbackMailslot,
 			}
+
+			log.Println("received message, sending to", m)
 			m.Send(*serverMailslot)
 			resp := <-s.Send
 			log.Println("response", resp)
+			_, err = conn.Write([]byte(resp.Data))
+			if err != nil {
+				return err
+			}
 		}
 	}
 }

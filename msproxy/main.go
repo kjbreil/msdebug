@@ -13,6 +13,7 @@ var (
 	serverMailslot   = flag.String("ms", `\\.\mailslot\win900`, "server mailslot location")
 	callbackMailslot = flag.String("cb", `\\.\mailslot\win900cb`, "server callback mailslot location")
 	isClient         = flag.Bool("client", false, "run as a client")
+	clientMailslot   = flag.String("cms", `\\.\mailslot\win900pr`, "the proxy mailslot")
 )
 
 func main() {
@@ -26,7 +27,10 @@ func main() {
 			log.Panicln(err)
 		}
 	case *isClient:
-		client()
+		err := client()
+		if err != nil {
+			log.Panicln(err)
+		}
 	default:
 		log.Fatalf("neither server or client command line passed")
 	}
