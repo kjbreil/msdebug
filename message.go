@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/xjtdy888/mailslot"
+	"golang.org/x/text/encoding/charmap"
 )
 
 // Message contains the message and the callback mailslot
@@ -21,7 +22,8 @@ func (m *Message) String() string {
 
 // Format the message for a mailslot
 func (m *Message) Format() string {
-	return fmt.Sprintf("%s,%s", m.Callback, m.Data)
+	enc, _ := charmap.Windows1252.NewEncoder().String(fmt.Sprintf("%s,%s", m.Callback, m.Data))
+	return enc
 }
 
 func readMailslot(ms *mailslot.MailSlot, size int32) (*Message, error) {
@@ -31,7 +33,8 @@ func readMailslot(ms *mailslot.MailSlot, size int32) (*Message, error) {
 		return nil, fmt.Errorf("mailslot reached eof")
 	}
 
-	s := string(buf[:n])
+	dec, _ := charmap.Windows1252.NewDecoder().Bytes(buf[:n])
+	s := string(dec)
 
 	sa := strings.Split(s, ",")
 	if len(sa) < 2 {
@@ -41,7 +44,7 @@ func readMailslot(ms *mailslot.MailSlot, size int32) (*Message, error) {
 		}, nil
 	}
 	// TODO: This will not work if there is a comma in the message, need to join on all but 0 oridinal
-	c, m := sa[0], sa[1]
+	c, m := sa[0], strings.Join(sa[1:], ",")
 	return &Message{
 		Data:     m,
 		Callback: c,

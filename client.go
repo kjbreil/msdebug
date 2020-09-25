@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/xjtdy888/mailslot"
+	"golang.org/x/text/encoding/charmap"
 )
 
 // Client is the "sending" proxy mailslot
@@ -69,8 +70,10 @@ func (c *Client) receiver() {
 		if m.Callback == "" {
 			continue
 		}
+		enc, _ := charmap.Windows1252.NewEncoder().String(m.Data)
+
 		// make a reader of the string to be copied into the mailslot
-		r := strings.NewReader(m.Data)
+		r := strings.NewReader(enc)
 		// open the mailslot
 		ms, err := mailslot.Open(m.Callback)
 		if err != nil {
