@@ -50,13 +50,11 @@ func readMailslot(ms *mailslot.MailSlot, size int32) (*Message, error) {
 
 // Send a message with callback to specific mailslot
 func (m *Message) Send(msAddress string) {
-	log.Println(m.Format())
 	r := strings.NewReader(m.Format())
 	// open the mailslot
 	ms, err := mailslot.Open(msAddress)
 	if err != nil {
 		// TODO: mailslot down so should put message back on queue and sleep
-		log.Println(msAddress)
 		log.Panicf("there was an error opening receiver mailslot: %v", err)
 	}
 	_, err = io.Copy(ms, r)
